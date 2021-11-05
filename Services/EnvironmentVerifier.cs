@@ -8,18 +8,9 @@ namespace MangaCMS.Services
 {
     public class EnvironmentVerifier : IVerifier
     {
-        private string[] _EnVarArr =
-        {
-            "Test:SyncKey",
-            "Test:DB_SERVER",
-            "Test:DB_NAME",
-            "Test:DB_USERNAME",
-            "Test:DB_PASSWORD",
-        };
-
         public void Checking()
         {
-            foreach(var name in _EnVarArr)
+            foreach (string name in Enum.GetNames(typeof(EnVarEnum)))
             {
                 if (!RuleExist(name))
                 {
