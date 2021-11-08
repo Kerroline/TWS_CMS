@@ -1,6 +1,7 @@
 ﻿using MangaCMS.DAL;
 using MangaCMS.Models;
 using MangaCMS.Services;
+using MangaCMS.Services.Authentication;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
@@ -19,7 +20,7 @@ namespace MangaCMS
     public class Startup
     {
         // свойство, которое будет хранить конфигурацию
-        public IConfiguration AppConfiguration { get;}
+        public IConfiguration Configuration { get;}
 
         public Startup()
         {
@@ -28,26 +29,33 @@ namespace MangaCMS
                 .AddJsonFile("appsettings.json", true)
                 .AddEnvironmentVariables();
 
-            AppConfiguration = builder.Build();
+            Configuration = builder.Build();
         }
         // This method gets called by the runtime. Use this method to add services to the container.
         // For more information on how to configure your application, visit https://go.microsoft.com/fwlink/?LinkID=398940
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddDbContext<MangaCMSContext>(options => options.UseNpgsql(AppConfiguration.GetConnectionString("MangaCMSDatabase")));
+            var signingKey = new SigningSymmetricKey(Configuration["Test:SymmetricKey"]);
+            services.AddSingleton<IJwtSigningEncodingKey>(signingKey);
+
+            services.AddControllers();
+
+            services.AddDbContext<MangaCMSContext>(options => options.UseNpgsql(Configuration.GetConnectionString("MangaCMSDatabase")));
 
 
             services.AddDefaultIdentity<CustomUser>(options => options.SignIn.RequireConfirmedAccount = true).AddRoles<IdentityRole>()
               .AddEntityFrameworkStores<MangaCMSContext>();
 
-            var test = AppConfiguration["Test:SyncKey"];
+            //var test = Configuration["Test:SymmetricKey"];
 
-            var optionsBuilder = new DbContextOptionsBuilder<MangaCMSContext>();
-            optionsBuilder.UseNpgsql(AppConfiguration.GetConnectionString("MangaCMSDatabase"));
+            services.AddCors();
 
             
 
 
+
+            //var optionsBuilder = new DbContextOptionsBuilder<MangaCMSContext>();
+            //optionsBuilder.UseNpgsql(AppConfiguration.GetConnectionString("MangaCMSDatabase"));
             //using (MangaCMSContext db = new MangaCMSContext(optionsBuilder.Options))
             //{
             //    CustomUser u1 = new CustomUser { UserName = "Test", PasswordHash = "qwer" };
@@ -61,11 +69,11 @@ namespace MangaCMS
 
         }
 
-        private async Task CreateRoles(IServiceProvider serviceProvider)
+        private async Task CreateRoles(RoleManager<IdentityRole> RoleManager, UserManager<CustomUser> UserManager)
         {
 
-            var RoleManager = serviceProvider.GetRequiredService<RoleManager<IdentityRole>>();
-            var UserManager = serviceProvider.GetRequiredService<UserManager<CustomUser>>();
+            //var RoleManager = serviceProvider.GetRequiredService<RoleManager<IdentityRole>>();
+            //var UserManager = serviceProvider.GetRequiredService<UserManager<CustomUser>>();
 
             string[] roleList = { "Admin", "User", "Moder", "Cleaner", "Translator", "Corrector", "Typer", "Editor" };
 
@@ -114,7 +122,7 @@ namespace MangaCMS
 
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, RoleManager<IdentityRole> RoleManager, UserManager<CustomUser> UserManager)
         {
             if (env.IsDevelopment())
             {
@@ -124,17 +132,20 @@ namespace MangaCMS
 
             app.UseRouting();
 
+            app.UseAuthentication();
+            app.UseAuthorization();
+
+
+            //var serviceProvider = app.ApplicationServices.GetService<IServiceProvider>();
+            //var RoleManager = serviceProvider.GetRequiredService<RoleManager<IdentityRole>>();
+            //var UserManager = serviceProvider.GetRequiredService<UserManager<CustomUser>>();
+
+            CreateRoles(RoleManager, UserManager).Wait();
+
             app.UseEndpoints(endpoints =>
             {
-                endpoints.MapGet("/", async context =>
-                {
-                    await context.Response.WriteAsync("HELLO");
-                });
+                endpoints.MapControllers();
             });
-            var serviceProvider = app.ApplicationServices.GetService<IServiceProvider>();
-            CreateRoles(serviceProvider).Wait();
-
-
         }
     }
 }
