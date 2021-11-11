@@ -13,7 +13,7 @@ namespace MangaCMS.Services.Authentication
 
         public const string ISSUER = "MangaCMS_API";
         public const string AUDIENCE = "MangaCMS_SPA";
-        public const int LIFETIME = 1;
+        public const int LIFETIME = 15; //min
 
         public string SigningAlgorithm { get; } = SecurityAlgorithms.HmacSha256;
 

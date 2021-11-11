@@ -16,7 +16,8 @@ using System.Threading.Tasks;
 
 namespace MangaCMS.Controllers
 {
-    [Route("api/[controller]")]
+    [ApiVersion("1.0")]
+    [Route("api/v{version:apiVersion}/[controller]")]
     [ApiController]
     public class AuthenticationController : ControllerBase
     {
@@ -49,9 +50,12 @@ namespace MangaCMS.Controllers
                     var claims = new Claim[]
                     {
                         new Claim(ClaimTypes.NameIdentifier, current_user.Result.UserName),
-                        //new Claim(ClaimTypes.Role, user_roles.Result.First())
+                        new Claim(ClaimTypes.Role, user_roles.Result.First()),
                     };
-
+                    //foreach (var r in user_roles.Result)
+                    //{
+                    //    claims.Append(new Claim(ClaimTypes.Role, r.ToString()));
+                    //};
                     var token = new JwtSecurityToken(
                         issuer: SigningSymmetricKey.ISSUER,
                         audience: SigningSymmetricKey.AUDIENCE,
@@ -73,6 +77,9 @@ namespace MangaCMS.Controllers
             ModelState.AddModelError("Auth", "Invalid username or password.");
             return BadRequest(ModelState);
         }
+
+        // Refresh Token
+        // Revoke Token
 
     }
 }

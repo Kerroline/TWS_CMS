@@ -2,6 +2,8 @@
 using MangaCMS.Models;
 using MangaCMS.Services;
 using MangaCMS.Services.Authentication;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
@@ -10,6 +12,8 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -38,7 +42,48 @@ namespace MangaCMS
             var signingKey = new SigningSymmetricKey(Configuration["Test:SymmetricKey"]);
             services.AddSingleton<IJwtSigningEncodingKey>(signingKey);
 
+
+
             services.AddControllers();
+
+            const string jwtSchemeName = "JwtBearer";
+            var signingDecodingKey = (IJwtSigningDecodingKey)signingKey;
+            services
+                .AddAuthentication(options => {
+                    options.DefaultAuthenticateScheme = jwtSchemeName;
+                    options.DefaultChallengeScheme = jwtSchemeName;
+                })
+                .AddJwtBearer(jwtSchemeName, jwtBearerOptions => {
+                    jwtBearerOptions.TokenValidationParameters = new TokenValidationParameters
+                    {
+                        ValidateIssuerSigningKey = true,
+                        IssuerSigningKey = signingDecodingKey.GetKey(),
+
+                        ValidateIssuer = true,
+                        ValidIssuer = SigningSymmetricKey.ISSUER,
+
+                        ValidateAudience = true,
+                        ValidAudience = SigningSymmetricKey.AUDIENCE,
+
+                        ValidateLifetime = true,
+
+                        ClockSkew = TimeSpan.FromSeconds(5),
+                        
+                    };
+                    jwtBearerOptions.Events = new JwtBearerEvents
+                    {
+                        OnAuthenticationFailed = context =>
+                        {
+                            if (context.Exception.GetType() == typeof(SecurityTokenExpiredException))
+                            {
+                                context.Response.Headers.Add("Token-Expired", "true");
+                            }
+                            return Task.CompletedTask;
+                        }
+                    };
+                });
+
+            services.AddAuthentication();
 
             services.AddDbContext<MangaCMSContext>(options => options.UseNpgsql(Configuration.GetConnectionString("MangaCMSDatabase")));
 
@@ -50,7 +95,16 @@ namespace MangaCMS
 
             services.AddCors();
 
-            
+
+            services.AddSwaggerGen(c =>
+            {
+                c.SwaggerDoc("v1", new OpenApiInfo
+                {
+                    Version = "v1",
+                    Title = "MangaCMS API"
+                });
+            });
+            services.AddApiVersioning();
 
 
 
@@ -124,6 +178,13 @@ namespace MangaCMS
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env, RoleManager<IdentityRole> RoleManager, UserManager<CustomUser> UserManager)
         {
+            app.UseSwagger();
+            app.UseSwaggerUI(c =>
+            {
+                c.SwaggerEndpoint("/swagger/v1/swagger.json", "MangaCMSl API V1");
+            });
+            app.UseApiVersioning();
+
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();

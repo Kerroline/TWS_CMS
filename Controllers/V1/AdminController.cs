@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
 using System.Threading.Tasks;
 
 namespace MangaCMS.Controllers
@@ -22,6 +23,16 @@ namespace MangaCMS.Controllers
         {
             _db = context;
             _userManager = manager;
+        }
+
+        // GET api/values
+        [HttpGet]
+        public ActionResult<IEnumerable<string>> Get()
+        {
+            var nameIdentifier = this.HttpContext.User.Claims
+                .FirstOrDefault(x => x.Type == ClaimTypes.NameIdentifier);
+
+            return new string[] { nameIdentifier?.Value, "value1", "value2" };
         }
 
     }
