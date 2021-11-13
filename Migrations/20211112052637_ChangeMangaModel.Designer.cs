@@ -3,15 +3,17 @@ using System;
 using MangaCMS.DAL;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 namespace MangaCMS.Migrations
 {
     [DbContext(typeof(MangaCMSContext))]
-    partial class MangaCMSContextModelSnapshot : ModelSnapshot
+    [Migration("20211112052637_ChangeMangaModel")]
+    partial class ChangeMangaModel
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

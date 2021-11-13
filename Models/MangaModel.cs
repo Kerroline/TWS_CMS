@@ -11,34 +11,38 @@ namespace MangaCMS.Models
     {
         [Key]
         public int Id { get; set; }
-        [Required]
-        public string OrigName { get; set; }
-        [Required]
-        public string RuName { get; set; }
-        [Required]
-        public string EngName { get; set; }
-        public string Poster { get; set; }          // Картинка 
 
         [Required]
-        public string Link { get; set; }            // Ссылка
+        public string JP_Name { get; set; }
         [Required]
-        public int Year { get; set; }               // Год  
+        public string RU_Name { get; set; }
         [Required]
-        public string Author { get; set; }          // Автор
-        [Required]
-        public string Description { get; set; }    // Описание
+        public string ENG_Name { get; set; }
 
-        public int StatusId { get; set; } // Внешний ключ для связи со статусами
+        public string ContentDirPath { get; set; }
+
+        public string PosterPath { get; set; }          
+
+        [Required]
+        public string Link { get; set; }            
+        [Required]
+        public int Year { get; set; }               
+        [Required]
+        public string Author { get; set; }          
+        [Required]
+        public string Description { get; set; }    
+
+        public int StatusId { get; set; } 
 
         [ForeignKey("StatusId")]
-        public virtual StatusModel Status { get; set; }     // Статус 
+        public virtual StatusModel Status { get; set; }     
 
 
         //public virtual MangasUsers MangasUsers { get; set; }
 
-        public virtual ICollection<MangaGenreModel> MangasGenres { get; set; }  // Жанры
+        public virtual ICollection<MangaGenreModel> MangasGenres { get; set; }  
 
-        public virtual ICollection<ChapterModel> Chapters { get; set; } // Главы
+        public virtual ICollection<ChapterModel> Chapters { get; set; } 
 
         public MangaModel()
         {

@@ -12,8 +12,10 @@ using System.Threading.Tasks;
 
 namespace MangaCMS.Controllers
 {
+    
+    [ApiVersion("1.0")]
+    [Route("api/v{version:apiVersion}/[controller]")]
     [Authorize(Roles = "Admin")]
-    [Route("api/[controller]")]
     [ApiController]
     public class AdminController : ControllerBase
     {

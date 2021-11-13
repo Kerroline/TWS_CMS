@@ -29,6 +29,7 @@
   <ItemGroup>
     <Folder Include="Models\Advanced_Models\" />
     <Folder Include="Migrations\" />
+    <Folder Include="wwwroot\Content\Manga\" />
   </ItemGroup>
 
 </Project>
