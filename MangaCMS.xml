@@ -1,0 +1,44 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>MangaCMS</name>
+    </assembly>
+    <members>
+        <member name="M:MangaCMS.Controllers.V1.MangaController.CreateMangaWithoutPoster(MangaCMS.Models.MangaModel)">
+             <summary>
+             Creates a new Project.
+             </summary>
+             <param name="Manga"></param>
+             <returns>A newly created project ID</returns>
+             <remarks>
+             Sample request:
+            
+                 POST /Create
+                 {
+                    ...
+                 }
+            
+             </remarks>
+             <response code="201">Returns the newly created item ID</response>
+             <response code="400">If the project is exist</response>
+        </member>
+        <member name="M:MangaCMS.Controllers.V1.StatusController.Create(MangaCMS.Models.StatusModel)">
+             <summary>
+             Creates a new Project.
+             </summary>
+             <param name="Status"></param>
+             <returns></returns>
+             <remarks>
+             Sample request:
+            
+                 POST /Create
+                 {
+                    "StatusName": "Name"
+                 }
+            
+             </remarks>
+             <response code="204">If the status is created</response>
+             <response code="400">If the status is exist</response>
+        </member>
+    </members>
+</doc>

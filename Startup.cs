@@ -16,7 +16,9 @@ using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Threading.Tasks;
 
 namespace MangaCMS
@@ -103,6 +105,10 @@ namespace MangaCMS
                     Version = "v1",
                     Title = "MangaCMS API"
                 });
+
+                //Set the comments path for the swagger json and ui.
+                var xmlFilename = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
+                c.IncludeXmlComments(Path.Combine(AppContext.BaseDirectory, xmlFilename));
             });
             services.AddApiVersioning();
 

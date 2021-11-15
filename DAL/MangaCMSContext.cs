@@ -21,7 +21,7 @@ namespace MangaCMS.DAL
         public MangaCMSContext(DbContextOptions<MangaCMSContext> options)
             : base(options)
         {
-            Database.EnsureCreated();
+            //Database.EnsureCreated();
         }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)

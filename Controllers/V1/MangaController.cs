@@ -34,6 +34,22 @@ namespace MangaCMS.Controllers.V1
             return await mangas.ToListAsync();
         }
 
+        /// <summary>
+        /// Creates a new Project.
+        /// </summary>
+        /// <param name="Manga"></param>
+        /// <returns>A newly created project ID</returns>
+        /// <remarks>
+        /// Sample request:
+        ///
+        ///     POST /Create
+        ///     {
+        ///        ...
+        ///     }
+        ///
+        /// </remarks>
+        /// <response code="201">Returns the newly created item ID</response>
+        /// <response code="400">If the project is exist</response>
         [Route("Create")]
         [Authorize(Roles = "Admin")]
         [HttpPost]
@@ -41,57 +57,51 @@ namespace MangaCMS.Controllers.V1
         {
             if (ModelState.IsValid)
             {
-                if (Manga.ENG_Name != null)
+                var MangasExist = _db.Mangas.FirstAsync
+                    (m => ((m.ENG_Name == Manga.ENG_Name) ||
+                            (m.RU_Name == Manga.RU_Name) ||
+                            (m.JP_Name == Manga.JP_Name))
+                    );
+                if (MangasExist is not null)
                 {
-                    var MangasExist = _db.Mangas.FirstAsync
-                        (m => ((m.ENG_Name == Manga.ENG_Name) ||
-                               (m.RU_Name == Manga.RU_Name) ||
-                               (m.JP_Name == Manga.JP_Name))
-                        );
-                    if (MangasExist == null)
+                    var EngNameWithoutSpaces = Manga.ENG_Name.Replace(" ", "");
+
+                    Manga.ContentDirPath = _env.WebRootPath + "/Content/Manga/" + EngNameWithoutSpaces;
+                    if (!Directory.Exists(Manga.ContentDirPath))
                     {
-                        var EngNameWithoutSpaces = Manga.ENG_Name.Replace(" ", "");
+                        Directory.CreateDirectory(Manga.ContentDirPath);
+                    }
+                    if (Directory.Exists(Manga.ContentDirPath))
+                    {
+                        _db.Mangas.Add(Manga);
+                        await _db.SaveChangesAsync();
+                        List<MangaModel> manga_list = await _db.Mangas.ToListAsync();
+                        var created_manga = manga_list.Last();
 
-                        Manga.ContentDirPath = _env.WebRootPath + "/Content/Manga/" + EngNameWithoutSpaces;
-                        if (!Directory.Exists(Manga.ContentDirPath))
+                        if (created_manga.ENG_Name == Manga.ENG_Name)
                         {
-                            Directory.CreateDirectory(Manga.ContentDirPath);
-                        }
-                        if (Directory.Exists(Manga.ContentDirPath))
-                        {
-                            _db.Mangas.Add(Manga);
-                            await _db.SaveChangesAsync();
-                            List<MangaModel> manga_list = await _db.Mangas.ToListAsync();
-                            var manga_id = manga_list.Last().Id;
-
-                            if (manga_id != null)
-                            {
-                                return StatusCode(201,manga_id);
-                            }
-                            else
-                            {
-                                return BadRequest("Manga fail to created");
-                            }
-                            
+                            return StatusCode(201, created_manga.Id);
                         }
                         else
                         {
-                            return BadRequest("Manga Dir fail to created");
+                            return StatusCode(500,"Manga fail to created");
                         }
+
                     }
                     else
                     {
-                        ModelState.AddModelError(Manga.ENG_Name, "A project already exists with this name");
-                        return BadRequest(ModelState);
+                        return StatusCode(500, "Content Directory not found");
                     }
-
+                }
+                else
+                {
+                    return StatusCode(400, "A project already exists with this name");
                 }
             }
-            return BadRequest("Invalid model");
-            
+            return StatusCode(400, "Invalid model");    
         }
 
-        [Route("Create/{id}/Poster")]
+        [Route("UploadPoster/{id}")]
         [Authorize(Roles = "Admin")]
         [HttpPost]
         public ActionResult<IFormFile> UploadPosterToManga(int id, IFormFile Poster)
@@ -99,7 +109,7 @@ namespace MangaCMS.Controllers.V1
             if (Poster != null)
             {
                 var current_manga = _db.Mangas.Find(id);
-                if (current_manga != null)
+                if (current_manga is not null)
                 {
                     current_manga.PosterPath = current_manga.ContentDirPath + "/Posters";
                     if (!Directory.Exists(current_manga.PosterPath))
@@ -112,23 +122,23 @@ namespace MangaCMS.Controllers.V1
                         {
                             Poster.CopyTo(fileStream);
                         }
-                        if (System.IO.File.Exists(current_manga.PosterPath + Poster.FileName))
+                        if (System.IO.File.Exists(current_manga.PosterPath + "/" + Poster.FileName))
                         {
                             return StatusCode(201);
                         }
                         else
                         {
-                            return BadRequest("Image not upload");
+                            return StatusCode(500, "Image not upload");
                         }
                     }
                     else
                     {
-                        return BadRequest("Manga Dir not found");
+                        return StatusCode(500, "Manga Directory not found");
                     }
                 }
-                return BadRequest("The Manga not exist");
+                return StatusCode(400, "The Manga not exist");
             }
-            return BadRequest("Image not sended");
+            return StatusCode(400, "Image not sended");
         }
         //if (Manga.EngName != null)
         //{

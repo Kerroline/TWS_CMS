@@ -3,12 +3,14 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 
 namespace MangaCMS.Models
 {
     public class MangaModel
     {
+        [JsonIgnore]
         [Key]
         public int Id { get; set; }
 
@@ -18,18 +20,17 @@ namespace MangaCMS.Models
         public string RU_Name { get; set; }
         [Required]
         public string ENG_Name { get; set; }
-
+        [JsonIgnore]
         public string ContentDirPath { get; set; }
-
+        [JsonIgnore]
         public string PosterPath { get; set; }          
 
-        [Required]
-        public string Link { get; set; }            
-        [Required]
-        public int Year { get; set; }               
-        [Required]
-        public string Author { get; set; }          
-        [Required]
+        public string Link { get; set; }      
+        
+        public int Year { get; set; }           
+        
+        public string Author { get; set; }
+
         public string Description { get; set; }    
 
         public int StatusId { get; set; } 
