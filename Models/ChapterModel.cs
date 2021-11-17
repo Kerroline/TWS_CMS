@@ -26,5 +26,12 @@ namespace MangaCMS.Models
 
         [ForeignKey("MangaId")]
         public MangaModel Manga { get; set; }
+
+        public virtual ICollection<PageModel> Pages { get; set; }
+
+        public ChapterModel()
+        {
+            Pages = new List<PageModel>();
+        }
     }
 }

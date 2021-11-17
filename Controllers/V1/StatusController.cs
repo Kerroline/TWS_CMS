@@ -31,7 +31,7 @@ namespace MangaCMS.Controllers.V1
         }
 
         /// <summary>
-        /// Creates a new Project.
+        /// Creates a new Status.
         /// </summary>
         /// <param name="Status"></param>
         /// <returns></returns>
@@ -58,23 +58,20 @@ namespace MangaCMS.Controllers.V1
                     {
                         return StatusCode(400, "Status exist");
                     }
-                    else
-                    {
-                        _db.Statuses.Add(Status);
-                        await _db.SaveChangesAsync();
+                }
+                _db.Statuses.Add(Status);
+                await _db.SaveChangesAsync();
 
-                        List<StatusModel> status_list = await _db.Statuses.ToListAsync();
-                        var created_status = status_list.Last();
+                List<StatusModel> status_list = await _db.Statuses.ToListAsync();
+                var created_status = status_list.Last();
 
-                        if (created_status.StatusName == Status.StatusName)
-                        {
-                            return StatusCode(204, "Status created");
-                        }
-                        else
-                        {
-                            return StatusCode(500, "Status fail to created");
-                        }
-                    }
+                if (created_status.StatusName == Status.StatusName)
+                {
+                    return StatusCode(204, "Status created");
+                }
+                else
+                {
+                    return StatusCode(500, "Status fail to created");
                 }
             }
             return StatusCode(400,"ModelState.Invalid");

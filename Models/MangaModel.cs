@@ -12,43 +12,45 @@ namespace MangaCMS.Models
     {
         [JsonIgnore]
         [Key]
-        public int Id { get; set; }
+        public int ID { get; set; }
 
         [Required]
-        public string JP_Name { get; set; }
+        public string japanName { get; set; }
         [Required]
-        public string RU_Name { get; set; }
+        public string russianName { get; set; }
         [Required]
-        public string ENG_Name { get; set; }
-        [JsonIgnore]
-        public string ContentDirPath { get; set; }
-        [JsonIgnore]
-        public string PosterPath { get; set; }          
-
-        public string Link { get; set; }      
+        public string englishName { get; set; }
         
-        public int Year { get; set; }           
+
+        public string link { get; set; }      
         
-        public string Author { get; set; }
+        public int year { get; set; }           
+        
+        public string author { get; set; }
 
-        public string Description { get; set; }    
+        public string description { get; set; }    
 
-        public int StatusId { get; set; } 
+        public int statusID { get; set; } 
 
-        [ForeignKey("StatusId")]
-        public virtual StatusModel Status { get; set; }     
+        [ForeignKey("statusID")]
+        public virtual StatusModel status { get; set; }     
+
+        public int fileID { get; set; }
+
+        [ForeignKey("fileID")]
+        public virtual FileModel poster { get; set; }
 
 
         //public virtual MangasUsers MangasUsers { get; set; }
 
-        public virtual ICollection<MangaGenreModel> MangasGenres { get; set; }  
+        public virtual ICollection<MangaGenreModel> listOfGenres { get; set; }  
 
-        public virtual ICollection<ChapterModel> Chapters { get; set; } 
+        public virtual ICollection<ChapterModel> listOfChapters { get; set; } 
 
         public MangaModel()
         {
-            MangasGenres = new List<MangaGenreModel>();
-            Chapters = new List<ChapterModel>();
+            listOfGenres = new List<MangaGenreModel>();
+            listOfChapters = new List<ChapterModel>();
         }
     }
 }

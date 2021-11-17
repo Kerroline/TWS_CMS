@@ -10,6 +10,8 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 
 namespace MangaCMS.Controllers.V1
 {
@@ -30,10 +32,21 @@ namespace MangaCMS.Controllers.V1
         [HttpGet]
         public async Task<ActionResult<IEnumerable<MangaModel>>> GetAll()
         {
-            var mangas = _db.Mangas.Include(m => m.Status);
+            var mangas = _db.Mangas.Include(m => m.status);
             return await mangas.ToListAsync();
         }
+        [Route("GetJSON")]
+        [HttpGet]
+        public ActionResult GetJson()
+        {
+            var mangas = _db.Mangas.Include(m => m.status);
 
+            var mangass = mangas.ToList();
+
+            //string json = JsonSerializer.Serialize(mangas);
+
+            return Ok(mangass);
+        }
         /// <summary>
         /// Creates a new Project.
         /// </summary>
@@ -57,40 +70,29 @@ namespace MangaCMS.Controllers.V1
         {
             if (ModelState.IsValid)
             {
-                var MangasExist = _db.Mangas.FirstAsync
-                    (m => ((m.ENG_Name == Manga.ENG_Name) ||
-                            (m.RU_Name == Manga.RU_Name) ||
-                            (m.JP_Name == Manga.JP_Name))
+                var MangasExist = _db.Mangas.Where
+                    (m => ((m.englishName == Manga.englishName) ||
+                            (m.russianName == Manga.russianName) ||
+                            (m.japanName == Manga.japanName))
                     );
-                if (MangasExist is not null)
+                if (!MangasExist.Any())
                 {
-                    var EngNameWithoutSpaces = Manga.ENG_Name.Replace(" ", "");
-
-                    Manga.ContentDirPath = _env.WebRootPath + "/Content/Manga/" + EngNameWithoutSpaces;
-                    if (!Directory.Exists(Manga.ContentDirPath))
+                    if (Manga.statusID == 0)
                     {
-                        Directory.CreateDirectory(Manga.ContentDirPath);
+                        Manga.statusID = 1;
                     }
-                    if (Directory.Exists(Manga.ContentDirPath))
+                    _db.Mangas.Add(Manga);
+                    await _db.SaveChangesAsync();
+                    List<MangaModel> manga_list = await _db.Mangas.ToListAsync();
+                    var created_manga = manga_list.Last();
+
+                    if (created_manga.englishName == Manga.englishName)
                     {
-                        _db.Mangas.Add(Manga);
-                        await _db.SaveChangesAsync();
-                        List<MangaModel> manga_list = await _db.Mangas.ToListAsync();
-                        var created_manga = manga_list.Last();
-
-                        if (created_manga.ENG_Name == Manga.ENG_Name)
-                        {
-                            return StatusCode(201, created_manga.Id);
-                        }
-                        else
-                        {
-                            return StatusCode(500,"Manga fail to created");
-                        }
-
+                        return StatusCode(201, created_manga.ID);
                     }
                     else
                     {
-                        return StatusCode(500, "Content Directory not found");
+                        return StatusCode(500, "Manga fail to created");
                     }
                 }
                 else
@@ -100,44 +102,63 @@ namespace MangaCMS.Controllers.V1
             }
             return StatusCode(400, "Invalid model");    
         }
-
-        [Route("UploadPoster/{id}")]
+        /// <summary>
+        /// Upload Poster to Manga.
+        /// </summary>
+        /// <param name="MangaID">Manga ID in URL</param>
+        /// <param name="PosterID">Poster ID </param>
+        /// <returns></returns>
+        /// <remarks>
+        /// Sample request:
+        ///
+        ///     POST /MangaID/UploadPoster
+        ///     {
+        ///        "Poster": file.png
+        ///     }
+        ///
+        /// </remarks>
+        /// <response code="204">If poster upload</response>
+        /// <response code="400">If poster not sended or manga not found</response>
+        [Route("{MangaID}/UploadPoster")]
         [Authorize(Roles = "Admin")]
         [HttpPost]
-        public ActionResult<IFormFile> UploadPosterToManga(int id, IFormFile Poster)
+        public ActionResult<IFormFile> UploadPosterToManga(int MangaID, int PosterID)
         {
-            if (Poster != null)
-            {
-                var current_manga = _db.Mangas.Find(id);
-                if (current_manga is not null)
-                {
-                    current_manga.PosterPath = current_manga.ContentDirPath + "/Posters";
-                    if (!Directory.Exists(current_manga.PosterPath))
-                    {
-                        Directory.CreateDirectory(current_manga.PosterPath);
-                    }
-                    if(Directory.Exists(current_manga.PosterPath))
-                    {
-                        using (var fileStream = new FileStream(current_manga.PosterPath, FileMode.Create))
-                        {
-                            Poster.CopyTo(fileStream);
-                        }
-                        if (System.IO.File.Exists(current_manga.PosterPath + "/" + Poster.FileName))
-                        {
-                            return StatusCode(201);
-                        }
-                        else
-                        {
-                            return StatusCode(500, "Image not upload");
-                        }
-                    }
-                    else
-                    {
-                        return StatusCode(500, "Manga Directory not found");
-                    }
-                }
-                return StatusCode(400, "The Manga not exist");
-            }
+            //if (Poster != null)
+            //{
+            //    var current_manga = _db.Mangas.Find(MangaID);
+            //    if (current_manga is not null)
+            //    {
+            //        current_manga.PosterPath = current_manga.ContentDirPath + "/Posters";
+            //        if (!Directory.Exists(current_manga.PosterPath))
+            //        {
+            //            Directory.CreateDirectory(current_manga.PosterPath);
+            //        }
+            //        if(Directory.Exists(current_manga.PosterPath))
+            //        {
+            //            int PosterCount = Directory.GetFiles(current_manga.PosterPath, "*", SearchOption.TopDirectoryOnly).Length;
+            //            string PosterName = $"Poster{PosterCount}.png";
+            //            var PathToSave = Path.Combine(current_manga.PosterPath + "/" + PosterName);
+            //            using (var fileStream = new FileStream(PathToSave, FileMode.Create))
+            //            {
+            //                Poster.CopyTo(fileStream);
+            //            }
+            //            if (System.IO.File.Exists(current_manga.PosterPath + "/" + PosterName))
+            //            {
+            //                return StatusCode(204);
+            //            }
+            //            else
+            //            {
+            //                return StatusCode(500, "Image not upload");
+            //            }
+            //        }
+            //        else
+            //        {
+            //            return StatusCode(500, "Manga Directory not found");
+            //        }
+            //    }
+            //    return StatusCode(400, "The Manga not exist");
+            //}
             return StatusCode(400, "Image not sended");
         }
         //if (Manga.EngName != null)

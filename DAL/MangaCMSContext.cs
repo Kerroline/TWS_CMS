@@ -16,7 +16,8 @@ namespace MangaCMS.DAL
         public DbSet<StatusModel> Statuses { get; set; }
         public DbSet<ChapterModel> Chapters { get; set; }
         public DbSet<ProgressModel> Progresses { get; set; }
-
+        public DbSet<PageModel> Pages { get; set; }
+        public DbSet<FileModel> Files { get; set; }
 
         public MangaCMSContext(DbContextOptions<MangaCMSContext> options)
             : base(options)
@@ -26,7 +27,9 @@ namespace MangaCMS.DAL
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            base.OnModelCreating(modelBuilder);
+            modelBuilder.Entity<StatusModel>().HasData(
+                new StatusModel { Id = 1, StatusName = "Настройка проекта" }
+                );
 
             modelBuilder
                 .Entity<ChapterModel>()
@@ -39,7 +42,7 @@ namespace MangaCMS.DAL
 
             modelBuilder.Entity<MangaGenreModel>()
                 .HasOne(mg => mg.Manga)
-                .WithMany(t => t.MangasGenres)
+                .WithMany(t => t.listOfGenres)
                 .HasForeignKey(mg => mg.MangaId);
 
             modelBuilder.Entity<MangaGenreModel>()
@@ -47,6 +50,7 @@ namespace MangaCMS.DAL
                 .WithMany(t => t.MangasGenres)
                 .HasForeignKey(mg => mg.GenreId);
 
+            base.OnModelCreating(modelBuilder);
         }
     }
 }

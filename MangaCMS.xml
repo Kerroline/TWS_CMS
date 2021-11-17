@@ -4,6 +4,62 @@
         <name>MangaCMS</name>
     </assembly>
     <members>
+        <member name="M:MangaCMS.Controllers.V1.ChapterController.GetAllFromManga(System.Int32)">
+             <summary>
+             Get all chapters for current manga.
+             </summary>
+             <param name="MangaID"></param>
+             <returns>List Charpters of this Manga</returns>
+             <remarks>
+             Sample request:
+            
+                 POST /GetForManga/1
+                 {
+                    "MangaID" : 1
+                 }
+            
+             </remarks>
+             <response code="200">Returns the list chapters</response>
+             /// <response code="204">If chapters is null</response>
+             <response code="400">If the manga not found</response>
+        </member>
+        <member name="M:MangaCMS.Controllers.V1.ChapterController.CreateChapter(System.Int32,MangaCMS.Models.ChapterModel)">
+             <summary>
+             Creates a new Project.
+             </summary>
+             <param name="MangaID"></param>
+             <param name="Chapter"></param>
+             <returns>A newly created project ID</returns>
+             <remarks>
+             Sample request:
+            
+                 POST /Create
+                 {
+                    ...
+                 }
+            
+             </remarks>
+             <response code="204">If successful created </response>
+             <response code="400">If the model invalid or manga not found</response>
+        </member>
+        <member name="M:MangaCMS.Controllers.V1.GenreController.Create(MangaCMS.Models.GenreModel)">
+             <summary>
+             Creates a new Genre.
+             </summary>
+             <param name="Genre"></param>
+             <returns></returns>
+             <remarks>
+             Sample request:
+            
+                 POST /Create
+                 {
+                    "GenreName": "Name"
+                 }
+            
+             </remarks>
+             <response code="204">If the genre is created</response>
+             <response code="400">If the genre is exist</response>
+        </member>
         <member name="M:MangaCMS.Controllers.V1.MangaController.CreateMangaWithoutPoster(MangaCMS.Models.MangaModel)">
              <summary>
              Creates a new Project.
@@ -22,9 +78,28 @@
              <response code="201">Returns the newly created item ID</response>
              <response code="400">If the project is exist</response>
         </member>
+        <member name="M:MangaCMS.Controllers.V1.MangaController.UploadPosterToManga(System.Int32,System.Int32)">
+             <summary>
+             Upload Poster to Manga.
+             </summary>
+             <param name="MangaID">Manga ID in URL</param>
+             <param name="PosterID">Poster ID </param>
+             <returns></returns>
+             <remarks>
+             Sample request:
+            
+                 POST /MangaID/UploadPoster
+                 {
+                    "Poster": file.png
+                 }
+            
+             </remarks>
+             <response code="204">If poster upload</response>
+             <response code="400">If poster not sended or manga not found</response>
+        </member>
         <member name="M:MangaCMS.Controllers.V1.StatusController.Create(MangaCMS.Models.StatusModel)">
              <summary>
-             Creates a new Project.
+             Creates a new Status.
              </summary>
              <param name="Status"></param>
              <returns></returns>

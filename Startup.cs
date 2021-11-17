@@ -46,7 +46,9 @@ namespace MangaCMS
 
 
 
-            services.AddControllers();
+            services.AddControllers().AddNewtonsoftJson(options =>
+                options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore
+            ); ;
 
             const string jwtSchemeName = "JwtBearer";
             var signingDecodingKey = (IJwtSigningDecodingKey)signingKey;
@@ -195,7 +197,7 @@ namespace MangaCMS
             {
                 app.UseDeveloperExceptionPage();
             }
-
+            app.UseStaticFiles();
 
             app.UseRouting();
 
