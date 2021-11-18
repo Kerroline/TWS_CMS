@@ -35,22 +35,19 @@ namespace MangaCMS.Models
         [ForeignKey("statusID")]
         public virtual StatusModel status { get; set; }     
 
-        public int fileID { get; set; }
-
-        [ForeignKey("fileID")]
-        public virtual FileModel poster { get; set; }
 
 
         //public virtual MangasUsers MangasUsers { get; set; }
 
         public virtual ICollection<MangaGenreModel> listOfGenres { get; set; }  
-
-        public virtual ICollection<ChapterModel> listOfChapters { get; set; } 
+        public virtual ICollection<ChapterModel> listOfChapters { get; set; }
+        public virtual ICollection<PosterModel> listOfPosters { get; set; }
 
         public MangaModel()
         {
             listOfGenres = new List<MangaGenreModel>();
             listOfChapters = new List<ChapterModel>();
+            listOfPosters = new List<PosterModel>();
         }
     }
 }

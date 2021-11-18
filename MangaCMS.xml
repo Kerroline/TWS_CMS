@@ -78,19 +78,20 @@
              <response code="201">Returns the newly created item ID</response>
              <response code="400">If the project is exist</response>
         </member>
-        <member name="M:MangaCMS.Controllers.V1.MangaController.UploadPosterToManga(System.Int32,System.Int32)">
+        <member name="M:MangaCMS.Controllers.V1.PosterController.UploadPosterToManga(System.Int32,Microsoft.AspNetCore.Http.IFormFile)">
              <summary>
              Upload Poster to Manga.
              </summary>
-             <param name="MangaID">Manga ID in URL</param>
-             <param name="PosterID">Poster ID </param>
+             <param name="mangaID">Manga ID in URL</param>
+             <param name="image">Poster ID </param>
              <returns></returns>
              <remarks>
              Sample request:
             
-                 POST /MangaID/UploadPoster
+                 POST /Upload
                  {
-                    "Poster": file.png
+                    "mangaID": 1
+                    "image": file.png
                  }
             
              </remarks>

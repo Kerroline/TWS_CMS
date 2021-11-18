@@ -16,8 +16,9 @@ namespace MangaCMS.DAL
         public DbSet<StatusModel> Statuses { get; set; }
         public DbSet<ChapterModel> Chapters { get; set; }
         public DbSet<ProgressModel> Progresses { get; set; }
-        public DbSet<PageModel> Pages { get; set; }
         public DbSet<FileModel> Files { get; set; }
+        public DbSet<PageModel> Pages { get; set; }
+        public DbSet<PosterModel> Posters { get; set; }
 
         public MangaCMSContext(DbContextOptions<MangaCMSContext> options)
             : base(options)

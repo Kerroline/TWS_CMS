@@ -19,10 +19,10 @@ namespace MangaCMS.Controllers.V1
     [ApiController]
     public class ChapterController : ControllerBase
     {
-        readonly MangaCMSContext _MangaContext;
+        private readonly MangaCMSContext _mangaContext;
         public ChapterController(MangaCMSContext context)
         {
-            _MangaContext = context;
+            _mangaContext = context;
         }
 
         /// <summary>
@@ -47,10 +47,10 @@ namespace MangaCMS.Controllers.V1
         [HttpGet]
         public ActionResult<IEnumerable<ChapterModel>> GetAllFromManga(int MangaID)
         {
-            var current_manga = _MangaContext.Mangas.Find(MangaID);
+            var current_manga = _mangaContext.Mangas.Find(MangaID);
             if (current_manga is not null)
             {
-                var chapters = _MangaContext.Chapters.Where(ch => ch.MangaId == MangaID);
+                var chapters = _mangaContext.Chapters.Where(ch => ch.MangaId == MangaID);
 
                 if(chapters is not null)
                 {
@@ -91,7 +91,7 @@ namespace MangaCMS.Controllers.V1
             if (ModelState.IsValid && MangaID != 0)
             {
 
-                var MangasExist = _MangaContext.Mangas.Find(MangaID);
+                var MangasExist = _mangaContext.Mangas.Find(MangaID);
                 if (MangasExist is not null)
                 {
                     //var ChrNameWithoutSpaces = Chapter.ChapterName.Replace(" ", "");
@@ -110,7 +110,7 @@ namespace MangaCMS.Controllers.V1
                     //    await _db.SaveChangesAsync();
 
 
-                    List<ChapterModel> chapter_list = await _MangaContext.Chapters.ToListAsync();
+                    List<ChapterModel> chapter_list = await _mangaContext.Chapters.ToListAsync();
                     var created_chapter = chapter_list.Last();
 
                     if ((created_chapter.ChapterName == Chapter.ChapterName)

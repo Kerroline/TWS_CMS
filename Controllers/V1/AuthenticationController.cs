@@ -22,11 +22,11 @@ namespace MangaCMS.Controllers
     public class AuthenticationController : ControllerBase
     {
         private readonly UserManager<CustomUser> _userManager;
-        private readonly MangaCMSContext _db;
+        private readonly MangaCMSContext _mangaContext;
 
         public AuthenticationController(MangaCMSContext context, UserManager<CustomUser> userManager)
         {
-            _db = context;
+            _mangaContext = context;
             _userManager = userManager;
         }
 

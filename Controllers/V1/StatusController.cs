@@ -17,17 +17,17 @@ namespace MangaCMS.Controllers.V1
     [ApiController]
     public class StatusController : ControllerBase
     {
-        readonly MangaCMSContext _db;
+        private readonly MangaCMSContext _mangaContext;
         public StatusController(MangaCMSContext context)
         {
-            _db = context;
+            _mangaContext = context;
         }
 
 
         [HttpGet]
         public async Task<ActionResult<IEnumerable<StatusModel>>> GetAll()
         {
-            return await _db.Statuses.ToListAsync();
+            return await _mangaContext.Statuses.ToListAsync();
         }
 
         /// <summary>
@@ -52,17 +52,17 @@ namespace MangaCMS.Controllers.V1
         {
             if(ModelState.IsValid)
             {
-                foreach(var status in _db.Statuses)
+                foreach(var status in _mangaContext.Statuses)
                 {
                     if (Status.StatusName == status.StatusName)
                     {
                         return StatusCode(400, "Status exist");
                     }
                 }
-                _db.Statuses.Add(Status);
-                await _db.SaveChangesAsync();
+                _mangaContext.Statuses.Add(Status);
+                await _mangaContext.SaveChangesAsync();
 
-                List<StatusModel> status_list = await _db.Statuses.ToListAsync();
+                List<StatusModel> status_list = await _mangaContext.Statuses.ToListAsync();
                 var created_status = status_list.Last();
 
                 if (created_status.StatusName == Status.StatusName)

@@ -19,11 +19,11 @@ namespace MangaCMS.Controllers
     [ApiController]
     public class AdminController : ControllerBase
     {
-        private readonly MangaCMSContext _db;
+        private readonly MangaCMSContext _mangaContext;
         private readonly UserManager<CustomUser> _userManager;
         public AdminController(UserManager<CustomUser> manager, MangaCMSContext context)
         {
-            _db = context;
+            _mangaContext = context;
             _userManager = manager;
         }
 

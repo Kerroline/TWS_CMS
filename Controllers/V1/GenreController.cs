@@ -18,16 +18,16 @@ namespace MangaCMS.Controllers.V1
     [ApiController]
     public class GenreController : ControllerBase
     {
-        readonly MangaCMSContext _db;
+        private readonly MangaCMSContext _mangaContext;
         public GenreController(MangaCMSContext context)
         {
-            _db = context;
+            _mangaContext = context;
         }
 
         [HttpGet]
         public async Task<ActionResult<IEnumerable<GenreModel>>> GetAll()
         {
-            return await _db.Genres.ToListAsync();
+            return await _mangaContext.Genres.ToListAsync();
         }
 
 
@@ -53,17 +53,17 @@ namespace MangaCMS.Controllers.V1
         {
             if (ModelState.IsValid)
             {
-                foreach (var genres in _db.Genres)
+                foreach (var genres in _mangaContext.Genres)
                 {
                     if (genres.GenreName == Genre.GenreName)
                     {
                         return StatusCode(400, "Genre exist");
                     }
                 }
-                _db.Genres.Add(Genre);
-                await _db.SaveChangesAsync();
+                _mangaContext.Genres.Add(Genre);
+                await _mangaContext.SaveChangesAsync();
 
-                List<GenreModel> genre_list = await _db.Genres.ToListAsync();
+                List<GenreModel> genre_list = await _mangaContext.Genres.ToListAsync();
                 var created_genres = genre_list.Last();
 
                 if (created_genres.GenreName == Genre.GenreName)
