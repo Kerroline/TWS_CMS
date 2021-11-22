@@ -17,20 +17,20 @@ namespace MangaCMS.Models
         public int ID { get; set; }
 
         [JsonIgnore]
-        public string Path { get; set; }
+        public string fileName { get; set; }
 
         [JsonIgnore]
-        readonly string rootpath; 
+        public string filePath { get; set; }
 
-        public FileModel(string filename, string mangaName,IFormFile file, IWebHostEnvironment env)
+        public FileModel(string mangaName,IFormFile file)
         {
-            rootpath = $"{env.WebRootPath}/Content/Manga/";
-            string pathToSave = $"{rootpath}{mangaName}/Posters/";
-            //var s1 = IsDirectoryExist(basePath);
-            //var s2 = IsDirectoryExist(pathToSave);
-            UploadFile(pathToSave, file, filename);
-            var s3 = IsUpload(filename);
-            Path = $"/Content/Manga/{mangaName}/Posters/{filename}";
+            fileName = GenerateUniqueFilename(Path.GetExtension(file.FileName));
+            filePath = $"Content/Manga/{mangaName}/Posters/{fileName}";
+        }
+        public FileModel(string mangaName,double chapterNumber, IFormFile file)
+        {
+            fileName = GenerateUniqueFilename(Path.GetExtension(file.FileName));
+            filePath = $"Content/Manga/{mangaName}/{chapterNumber}/{fileName}";
         }
         public FileModel()
         {
@@ -39,23 +39,19 @@ namespace MangaCMS.Models
 
 
 
-        protected void UploadFile(string pathToSave, IFormFile file, string filename)
+        public void UploadFile(string pathToSave, IFormFile file)
         {
-
-            if(IsDirectoryExist(pathToSave))
+            using (var fileStream = new FileStream(pathToSave, FileMode.Create))
             {
-                using (var fileStream = new FileStream($"{pathToSave}/{filename}", FileMode.Create))
-                {
-                    file.CopyTo(fileStream);
-                }
+                file.CopyTo(fileStream);
             }
         }
-        public bool IsUpload(string filename)
+        public bool IsUpload(string pathToSave)
         {
-            var current_files = Directory.GetFiles(rootpath, "*", SearchOption.AllDirectories);
-            foreach(var file in current_files)
+            var current_files = Directory.GetFiles(pathToSave, "*", SearchOption.AllDirectories);
+            foreach (var file in current_files)
             {
-                if(file == filename)
+                if (file == pathToSave)
                 {
                     return true;
                 }
@@ -80,9 +76,9 @@ namespace MangaCMS.Models
             }
         }
 
-        protected static string GenerateUniqueFilename(string extension)
+        protected string GenerateUniqueFilename(string extension)
         {
-            return $"{Guid.NewGuid()}{extension}";
+            return $"{Guid.NewGuid().ToString().Replace("-", "")}{extension}";
         }
     }
 }

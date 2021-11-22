@@ -15,7 +15,7 @@ namespace MangaCMS.Models
         public int Id { get; set; }
 
         [Required]
-        public int ChapterNumber { get; set; }
+        public double ChapterNumber { get; set; }
 
         [Required]
         public string ChapterName { get; set; }

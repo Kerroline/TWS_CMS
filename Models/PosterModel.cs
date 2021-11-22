@@ -9,22 +9,15 @@ namespace MangaCMS.Models
 {
     public class PosterModel : FileModel
     {
-        public string posterName { get; set;}
+        
 
         public int mangaID { get; set; }
 
         public PosterModel()
         { }
-        public PosterModel(string mangaName, IFormFile image, IWebHostEnvironment env) 
-            : base(GenerateName(out string posterName), mangaName, image, env)
+        public PosterModel(string mangaName, IFormFile image) 
+            : base(mangaName, image)
         {
-            this.posterName = posterName;
-        }
-
-        private static string GenerateName(out string posterName)
-        {
-            return posterName = GenerateUniqueFilename(".png");
-        }       
-
+        }     
     }
 }

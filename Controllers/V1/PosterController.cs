@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -49,24 +50,22 @@ namespace MangaCMS.Controllers.V1
         {
             if (image != null)
             {
-                //string mangaNameWithoutSpaces = current_manga.englishName.Replace(" ", "");
-                //string mangaNameWithoutSpaces = "TESTMANGAAAAAAAAAAAA";
-                //PosterModel poster = new PosterModel(mangaNameWithoutSpaces, image, _env);
-
                 var current_manga = _mangaContext.Mangas.Find(mangaID);
                 if (current_manga is not null)
                 {
-                    
+                    string mangaNameWithoutSpaces = current_manga.englishName.Replace(" ", "").ToLower();
 
-                    //poster.IsUpload()
-
-                    if (true)
+                    PosterModel poster = new PosterModel(mangaNameWithoutSpaces, image)
                     {
-                        string mangaNameWithoutSpaces = current_manga.englishName.Replace(" ", "");
-                        PosterModel poster = new PosterModel(mangaNameWithoutSpaces, image, _env)
-                        {
-                            mangaID = current_manga.ID
-                        };
+                        mangaID = current_manga.ID
+                    };
+
+                    string pathToSave = Path.Combine(_env.WebRootPath, poster.filePath);
+                    poster.UploadFile(pathToSave, image);
+
+                    
+                    if (poster.IsUpload(pathToSave))
+                    {
                         current_manga.listOfPosters.Add(poster);
                         _mangaContext.Add(poster);
                         _mangaContext.SaveChanges();
@@ -77,33 +76,6 @@ namespace MangaCMS.Controllers.V1
                     {
                         return StatusCode(500, "Image not upload");
                     }
-                    //        current_manga.PosterPath = current_manga.ContentDirPath + "/Posters";
-                    //        if (!Directory.Exists(current_manga.PosterPath))
-                    //        {
-                    //            Directory.CreateDirectory(current_manga.PosterPath);
-                    //        }
-                    //        if(Directory.Exists(current_manga.PosterPath))
-                    //        {
-                    //            int PosterCount = Directory.GetFiles(current_manga.PosterPath, "*", SearchOption.TopDirectoryOnly).Length;
-                    //            string PosterName = $"Poster{PosterCount}.png";
-                    //            var PathToSave = Path.Combine(current_manga.PosterPath + "/" + PosterName);
-                    //            using (var fileStream = new FileStream(PathToSave, FileMode.Create))
-                    //            {
-                    //                Poster.CopyTo(fileStream);
-                    //            }
-                    //            if (System.IO.File.Exists(current_manga.PosterPath + "/" + PosterName))
-                    //            {
-                    //                return StatusCode(204);
-                    //            }
-                    //            else
-                    //            {
-                    //                return StatusCode(500, "Image not upload");
-                    //            }
-                    //        }
-                    //        else
-                    //        {
-                    //            return StatusCode(500, "Manga Directory not found");
-                    //        }
                 }
                 return StatusCode(400, "The Manga not exist");
             }
