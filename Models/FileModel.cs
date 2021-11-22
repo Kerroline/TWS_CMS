@@ -41,9 +41,13 @@ namespace MangaCMS.Models
 
         public void UploadFile(string pathToSave, IFormFile file)
         {
-            using (var fileStream = new FileStream(pathToSave, FileMode.Create))
+            string dirToSave = pathToSave.Remove(pathToSave.IndexOf(fileName), fileName.Length);
+            if (IsDirectoryExist(dirToSave))
             {
-                file.CopyTo(fileStream);
+                using (var fileStream = new FileStream(pathToSave, FileMode.Create))
+                {
+                    file.CopyTo(fileStream);
+                }
             }
         }
         public bool IsUpload(string pathToSave)

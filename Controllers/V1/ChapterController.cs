@@ -42,7 +42,7 @@ namespace MangaCMS.Controllers.V1
         /// <response code="200">Returns the list chapters</response>
         /// /// <response code="204">If chapters is null</response>
         /// <response code="400">If the manga not found</response>
-        [Route("GetForManga")]
+        [Route("GetAllForManga")]
         [AllowAnonymous]
         [HttpGet]
         public ActionResult<IEnumerable<ChapterModel>> GetAllFromManga(int MangaID)
@@ -86,29 +86,18 @@ namespace MangaCMS.Controllers.V1
         [Route("Create")]
         [Authorize(Roles = "Admin")]
         [HttpPost]
-        public async Task<ActionResult<ChapterModel>> CreateChapter(int MangaID, ChapterModel Chapter)
+        public async Task<ActionResult<ChapterModel>> CreateChapter(ChapterModel Chapter)
         {
-            if (ModelState.IsValid && MangaID != 0)
+            if (ModelState.IsValid)
             {
 
-                var MangasExist = _mangaContext.Mangas.Find(MangaID);
+                var MangasExist = _mangaContext.Mangas.Find(Chapter.MangaId);
                 if (MangasExist is not null)
                 {
-                    //var ChrNameWithoutSpaces = Chapter.ChapterName.Replace(" ", "");
-                    //MangasExist.ContentDirPath;
+                    MangasExist.listOfChapters.Add(Chapter);
 
-                    //if (!Directory.Exists(Manga.ContentDirPath))
-                    //{
-                    //    Directory.CreateDirectory(Manga.ContentDirPath);
-                    //}
-                    //if (Directory.Exists(Manga.ContentDirPath))
-                    //{
-
-
-
-                    //    _db.Mangas.Add(Manga);
-                    //    await _db.SaveChangesAsync();
-
+                    _mangaContext.Chapters.Add(Chapter);
+                    await _mangaContext.SaveChangesAsync();
 
                     List<ChapterModel> chapter_list = await _mangaContext.Chapters.ToListAsync();
                     var created_chapter = chapter_list.Last();
@@ -125,56 +114,13 @@ namespace MangaCMS.Controllers.V1
                     {
                         return StatusCode(500, "Chapter fail to created");
                     }
-                //}
-                //else
-                //{
-                //    return statuscode(500, "content directory not found");
-                //}
                 }
                 else
                 {
                     return StatusCode(400, "A Manga not found");
                 }
-            //    var EngNameWithoutSpaces = Manga.ENG_Name.Replace(" ", "");
-
-
-            //    Manga.ContentDirPath = _env.WebRootPath + "/Content/Manga/" + EngNameWithoutSpaces;
-            //    if (!Directory.Exists(Manga.ContentDirPath))
-            //    {
-            //        Directory.CreateDirectory(Manga.ContentDirPath);
-            //    }
-            //    if (Directory.Exists(Manga.ContentDirPath))
-            //    {
-            //        if (Manga.StatusId == 0)
-            //        {
-            //            Manga.StatusId = 1;
-            //        }
-            //        _db.Mangas.Add(Manga);
-            //        await _db.SaveChangesAsync();
-            //        List<MangaModel> manga_list = await _db.Mangas.ToListAsync();
-            //        var created_manga = manga_list.Last();
-
-            //        if (created_manga.ENG_Name == Manga.ENG_Name)
-            //        {
-            //            return StatusCode(201, created_manga.Id);
-            //        }
-            //        else
-            //        {
-            //            return StatusCode(500, "Manga fail to created");
-            //        }
-            //    }
-            //    else
-            //    {
-            //        return StatusCode(500, "Content Directory not found");
-            //    }
-            //}
-            //else
-            //{
-            //    return StatusCode(400, "A project already exists with this name");
-            //}
+            }
+            return StatusCode(400, "Invalid model");
         }
-        return StatusCode(400, "Invalid model");
-
-    }
     }
 }

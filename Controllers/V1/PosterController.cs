@@ -43,7 +43,7 @@ namespace MangaCMS.Controllers.V1
         /// </remarks>
         /// <response code="204">If poster upload</response>
         /// <response code="400">If poster not sended or manga not found</response>
-        [Route("Upload")]
+        [Route("Create")]
         [Authorize(Roles = "Admin")]
         [HttpPost]
         public ActionResult<IFormFile> UploadPosterToManga(int mangaID, IFormFile image)

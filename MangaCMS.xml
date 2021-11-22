@@ -23,7 +23,7 @@
              /// <response code="204">If chapters is null</response>
              <response code="400">If the manga not found</response>
         </member>
-        <member name="M:MangaCMS.Controllers.V1.ChapterController.CreateChapter(System.Int32,MangaCMS.Models.ChapterModel)">
+        <member name="M:MangaCMS.Controllers.V1.ChapterController.CreateChapter(MangaCMS.Models.ChapterModel)">
              <summary>
              Creates a new Project.
              </summary>
@@ -77,6 +77,26 @@
              </remarks>
              <response code="201">Returns the newly created item ID</response>
              <response code="400">If the project is exist</response>
+        </member>
+        <member name="M:MangaCMS.Controllers.V1.PagesController.CreatePages(System.Int32,Microsoft.AspNetCore.Http.IFormFileCollection)">
+             <summary>
+             Upload pages (images) to chapter
+             </summary>
+             <param name="chapterID">Chapter ID</param>
+             <param name="pages">Collection of images </param>
+             <returns></returns>
+             <remarks>
+             Sample request:
+            
+                 PUT /Create
+                 {
+                    "chapterID": 1
+                    "pages" []: file.png,file.png, ... file.png
+                 }
+            
+             </remarks>
+             <response code="204">If poster upload</response>
+             <response code="400">If poster not sended or manga not found</response>
         </member>
         <member name="M:MangaCMS.Controllers.V1.PosterController.UploadPosterToManga(System.Int32,Microsoft.AspNetCore.Http.IFormFile)">
              <summary>
