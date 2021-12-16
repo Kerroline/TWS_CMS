@@ -50,7 +50,7 @@ namespace MangaCMS.Controllers
                     var claims = new Claim[]
                     {
                         new Claim(ClaimTypes.NameIdentifier, current_user.Result.UserName),
-                        new Claim(ClaimTypes.Role, user_roles.Result.First()),
+                        //new Claim(ClaimTypes.Role, user_roles.Result.First()),
                     };
                     //foreach (var r in user_roles.Result)
                     //{

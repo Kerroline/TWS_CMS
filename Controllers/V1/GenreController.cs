@@ -46,7 +46,7 @@ namespace MangaCMS.Controllers.V1
         ///
         /// </remarks>
         /// <response code="204">If the genre is created</response>
-        /// <response code="400">If the genre is exist</response>
+        /// <response code="400">If the genre is exist or model invalid</response>
         [Route("Create")]
         [HttpPost]
         public async Task<ActionResult<GenreModel>> Create(GenreModel Genre)

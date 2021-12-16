@@ -89,7 +89,7 @@ namespace MangaCMS
 
             services.AddAuthentication();
 
-            services.AddDbContext<MangaCMSContext>(options => options.UseNpgsql(Configuration.GetConnectionString("MangaCMSDatabase")));
+            services.AddDbContext<MangaCMSContext>(options => options.UseNpgsql(Configuration.GetConnectionString("MangaRemoteDBPG")));
 
 
             services.AddDefaultIdentity<CustomUser>(options => options.SignIn.RequireConfirmedAccount = true).AddRoles<IdentityRole>()
@@ -114,10 +114,8 @@ namespace MangaCMS
             });
             services.AddApiVersioning();
 
-
-
             //var optionsBuilder = new DbContextOptionsBuilder<MangaCMSContext>();
-            //optionsBuilder.UseNpgsql(AppConfiguration.GetConnectionString("MangaCMSDatabase"));
+            //optionsBuilder.UseNpgsql(Configuration.GetConnectionString("MangaCMSDBPG"));
             //using (MangaCMSContext db = new MangaCMSContext(optionsBuilder.Options))
             //{
             //    CustomUser u1 = new CustomUser { UserName = "Test", PasswordHash = "qwer" };
@@ -184,8 +182,15 @@ namespace MangaCMS
 
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, RoleManager<IdentityRole> RoleManager, UserManager<CustomUser> UserManager)
+        public void Configure(
+            IApplicationBuilder app, 
+            IWebHostEnvironment env, 
+            RoleManager<IdentityRole> RoleManager, 
+            UserManager<CustomUser> UserManager,
+            MangaCMSContext mangaCMSContext
+            )
         {
+
             app.UseSwagger();
             app.UseSwaggerUI(c =>
             {
@@ -208,7 +213,7 @@ namespace MangaCMS
             //var serviceProvider = app.ApplicationServices.GetService<IServiceProvider>();
             //var RoleManager = serviceProvider.GetRequiredService<RoleManager<IdentityRole>>();
             //var UserManager = serviceProvider.GetRequiredService<UserManager<CustomUser>>();
-
+            mangaCMSContext.Database.Migrate();
             CreateRoles(RoleManager, UserManager).Wait();
 
             app.UseEndpoints(endpoints =>

@@ -46,7 +46,7 @@ namespace MangaCMS.Controllers.V1
         [Route("Create")]
         [Authorize(Roles = "Admin")]
         [HttpPost]
-        public ActionResult<IFormFile> UploadPosterToManga(int mangaID, IFormFile image)
+        public ActionResult<IFormFile> UploadPosterToManga([FromForm]int mangaID, IFormFile image)
         {
             if (image != null)
             {
@@ -63,19 +63,13 @@ namespace MangaCMS.Controllers.V1
                     string pathToSave = Path.Combine(_env.WebRootPath, poster.filePath);
                     poster.UploadFile(pathToSave, image);
 
-                    
-                    if (poster.IsUpload(pathToSave))
-                    {
-                        current_manga.listOfPosters.Add(poster);
-                        _mangaContext.Add(poster);
-                        _mangaContext.SaveChanges();
 
-                        return StatusCode(204);
-                    }
-                    else
-                    {
-                        return StatusCode(500, "Image not upload");
-                    }
+                    current_manga.listOfPosters.Add(poster);
+                    _mangaContext.Add(poster);
+                    _mangaContext.SaveChanges();
+
+                    return StatusCode(204);
+
                 }
                 return StatusCode(400, "The Manga not exist");
             }
