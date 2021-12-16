@@ -40,7 +40,8 @@ namespace MangaCMS.Controllers.V1
         [HttpGet]
         public async Task<ActionResult<IEnumerable<StatusModel>>> GetAll()
         {
-            return await _mangaContext.Statuses.ToListAsync();
+            //var status_list = await _mangaContext.Statuses.Include(m => m.Mangas).ToListAsync();
+            return await _mangaContext.Statuses.Include(m => m.Mangas).ToListAsync();
         }
 
         /// <summary>
@@ -126,9 +127,16 @@ namespace MangaCMS.Controllers.V1
         /// <response code="400">If the status is exist or model invalid</response>
         [Route("Edit/{id}")]
         [HttpPut]
-        public async Task<ActionResult<StatusModel>> Edit(int id)
+        public async Task<ActionResult<StatusModel>> Edit(int id, StatusModel status)
         {
-            return StatusCode(200, "Status update");
+            var current_status = await _mangaContext.Statuses.FindAsync(id);
+            if (current_status != null)
+            {
+                current_status.StatusName = status.StatusName;
+                await _mangaContext.SaveChangesAsync();
+                return StatusCode(200, "A StatusName is update");
+            }
+            return StatusCode(400, "A Status not found");
         }
 
         /// <summary>
@@ -151,7 +159,14 @@ namespace MangaCMS.Controllers.V1
         [HttpDelete]
         public async Task<ActionResult<StatusModel>> Delete(int id)
         {
-            return StatusCode(204, "Status delete");
+            var current_status = await _mangaContext.Statuses.FindAsync(id);
+            if (current_status != null)
+            {
+                _mangaContext.Statuses.Remove(current_status);
+                await _mangaContext.SaveChangesAsync();
+                return StatusCode(200, "A StatusName is delete");
+            }
+            return StatusCode(400, "A Status not found");
         }
 
     }
