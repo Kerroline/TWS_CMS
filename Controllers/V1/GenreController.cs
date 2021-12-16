@@ -66,14 +66,7 @@ namespace MangaCMS.Controllers.V1
                 List<GenreModel> genre_list = await _mangaContext.Genres.ToListAsync();
                 var created_genres = genre_list.Last();
 
-                if (created_genres.GenreName == Genre.GenreName)
-                {
-                    return StatusCode(204, "Genre created");
-                }
-                else
-                {
-                    return StatusCode(500, "Status fail to created");
-                }
+                return StatusCode(204, "Genre created");
             }
             return StatusCode(400, "Model invalid");
         }
