@@ -23,20 +23,7 @@ namespace MangaCMS.Controllers.V1
             _mangaContext = context;
         }
 
-        /// <summary>
-        /// Get all statuses.
-        /// </summary>
-        /// <returns></returns>
-        /// <remarks>
-        /// Sample request:
-        ///
-        ///     POST /GetAll
-        ///     {
-        ///     }
-        ///
-        /// </remarks>
-        /// <response code="200">List of Statuses</response>
-        [Route("GetAll")]
+
         [HttpGet]
         public async Task<ActionResult<IEnumerable<StatusModel>>> GetAll()
         {
@@ -44,35 +31,9 @@ namespace MangaCMS.Controllers.V1
         }
 
         /// <summary>
-        /// Get once status.
-        /// </summary>
-        /// <returns></returns>
-        /// <remarks>
-        /// Sample request:
-        ///
-        ///     GET /Get/1
-        ///     {
-        ///     }
-        ///
-        /// </remarks>
-        /// <response code="200">Status by id</response>
-        /// /// <response code="400">Status not found</response>
-        [Route("Get/{id}")]
-        [HttpGet]
-        public async Task<ActionResult<StatusModel>> Get(int id)
-        {
-            var current_status = await _mangaContext.Statuses.FindAsync(id);
-            if (current_status != null)
-            {
-                return current_status;
-            }
-            return StatusCode(400, "Status not found");
-        }
-
-        /// <summary>
         /// Creates a new Status.
         /// </summary>
-        /// <param name="status"></param>
+        /// <param name="Status"></param>
         /// <returns></returns>
         /// <remarks>
         /// Sample request:
@@ -84,74 +45,37 @@ namespace MangaCMS.Controllers.V1
         ///
         /// </remarks>
         /// <response code="204">If the status is created</response>
-        /// <response code="400">If the status is exist or model invalid</response>
+        /// <response code="400">If the status is exist</response>
         [Route("Create")]
         [HttpPost]
-        public async Task<ActionResult<StatusModel>> Create(StatusModel status)
+        public async Task<ActionResult<StatusModel>> Create(StatusModel Status)
         {
-            if (ModelState.IsValid)
+            if(ModelState.IsValid)
             {
-                foreach (var statusFromDB in _mangaContext.Statuses)
+                foreach(var status in _mangaContext.Statuses)
                 {
-                    if (status.StatusName == statusFromDB.StatusName)
+                    if (Status.StatusName == status.StatusName)
                     {
                         return StatusCode(400, "Status exist");
                     }
                 }
-                _mangaContext.Statuses.Add(status);
+                _mangaContext.Statuses.Add(Status);
                 await _mangaContext.SaveChangesAsync();
 
-                return StatusCode(204, "Status created");
+                List<StatusModel> status_list = await _mangaContext.Statuses.ToListAsync();
+                var created_status = status_list.Last();
 
+                if (created_status.StatusName == Status.StatusName)
+                {
+                    return StatusCode(204, "Status created");
+                }
+                else
+                {
+                    return StatusCode(500, "Status fail to created");
+                }
             }
-            return StatusCode(400, "ModelState.Invalid");
-
-        }
-
-        /// <summary>
-        /// Edit a exist status
-        /// </summary>
-        /// <param name="Status"></param>
-        /// <returns></returns>
-        /// <remarks>
-        /// Sample request:
-        ///
-        ///     PUT /Edit/1
-        ///     {
-        ///        "StatusName": "newName"
-        ///     }
-        ///
-        /// </remarks>
-        /// <response code="204">If the status is created</response>
-        /// <response code="400">If the status is exist or model invalid</response>
-        [Route("Edit/{id}")]
-        [HttpPut]
-        public async Task<ActionResult<StatusModel>> Edit(int id)
-        {
-            return StatusCode(200, "Status update");
-        }
-
-        /// <summary>
-        /// Delete a exist status
-        /// </summary>
-        /// <param name="Status"></param>
-        /// <returns></returns>
-        /// <remarks>
-        /// Sample request:
-        ///
-        ///     PUT /Edit/1
-        ///     {
-        ///        "StatusName": "newName"
-        ///     }
-        ///
-        /// </remarks>
-        /// <response code="204">If the status is created</response>
-        /// <response code="400">If the status is exist or model invalid</response>
-        [Route("Delete/{id}")]
-        [HttpDelete]
-        public async Task<ActionResult<StatusModel>> Delete(int id)
-        {
-            return StatusCode(204, "Status delete");
+            return StatusCode(400,"ModelState.Invalid");
+           
         }
 
     }
