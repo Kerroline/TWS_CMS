@@ -110,10 +110,11 @@ namespace MangaCMS
                 });
                 c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
                 {
+                    Type = SecuritySchemeType.Http,
+                    BearerFormat = "JWT",
                     In = ParameterLocation.Header,
-                    Description = "Please insert JWT with Bearer into field",
-                    Name = "Authorization",
-                    Type = SecuritySchemeType.ApiKey
+                    Scheme = "Bearer",
+                    Description = "Please insert JWT token into field"
                 });
                 c.AddSecurityRequirement(new OpenApiSecurityRequirement 
                 {
