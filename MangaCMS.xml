@@ -42,6 +42,37 @@
              <response code="204">If successful created </response>
              <response code="400">If the model invalid or manga not found</response>
         </member>
+        <member name="M:MangaCMS.Controllers.V1.GenreController.GetAll">
+             <summary>
+             Get all genres
+             </summary>
+             <returns></returns>
+             <remarks>
+             Sample request:
+            
+                 GET /GetAll
+                 {
+                 }
+            
+             </remarks>
+             <response code="200">List of Genres</response>
+        </member>
+        <member name="M:MangaCMS.Controllers.V1.GenreController.GetOnce(System.Int32)">
+             <summary>
+             Get once genre.
+             </summary>
+             <returns></returns>
+             <remarks>
+             Sample request:
+            
+                 GET /GetOnce/1
+                 {
+                 }
+            
+             </remarks>
+             <response code="200">Genre by id</response>
+             <response code="400">Genre is not found</response>
+        </member>
         <member name="M:MangaCMS.Controllers.V1.GenreController.Create(MangaCMS.Models.GenreModel)">
              <summary>
              Creates a new Genre.
@@ -59,6 +90,42 @@
              </remarks>
              <response code="204">If the genre is created</response>
              <response code="400">If the genre is exist or model invalid</response>
+        </member>
+        <member name="M:MangaCMS.Controllers.V1.GenreController.Edit(System.Int32,MangaCMS.Models.GenreModel)">
+             <summary>
+             Edit an exist genre
+             </summary>
+             <param name="id"></param>
+             <param name="genre"></param>
+             <returns></returns>
+             <remarks>
+             Sample request:
+            
+                 PUT /Edit/1
+                 {
+                    "GenreName": "newName"
+                 }
+            
+             </remarks>
+             <response code="204">If the genre is update</response>
+             <response code="400">If the genre is not found or model invalid</response>
+        </member>
+        <member name="M:MangaCMS.Controllers.V1.GenreController.Delete(System.Int32)">
+             <summary>
+             Delete an exist genre
+             </summary>
+             <param name="id"></param>
+             <returns></returns>
+             <remarks>
+             Sample request:
+            
+                 DELETE /Delete/1
+                 {
+                 }
+            
+             </remarks>
+             <response code="204">If the status is deleted</response>
+             <response code="400">If the status is not found</response>
         </member>
         <member name="M:MangaCMS.Controllers.V1.MangaController.CreateMangaWithoutPoster(MangaCMS.Models.MangaModel)">
              <summary>
