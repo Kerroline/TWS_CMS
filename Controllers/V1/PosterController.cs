@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -23,6 +24,66 @@ namespace MangaCMS.Controllers.V1
         {
             _mangaContext = context;
             _env = env;
+        }
+
+        /// <summary>
+        /// Gets last upload poster to the current manga
+        /// </summary>
+        /// <param name="mangaID">Manga ID in URL</param>
+        /// <returns></returns>
+        /// <remarks>
+        /// Sample request:
+        ///
+        ///     Get /GetAll/1
+        ///     {
+        ///     }
+        ///
+        /// </remarks>
+        /// <response code="200">List of String path to poster</response>
+        /// <response code="400">If a manga is not found or has not posters</response>
+        [Route("GetAll/{mangaID}")]
+        [HttpGet]
+        public async Task<ActionResult<IEnumerable<string>>> GetAll(int mangaID)
+        {
+            var allPosterForManga = await _mangaContext.Posters.Where(p => p.mangaID == mangaID).ToListAsync();
+
+            if (allPosterForManga.Any())
+            {
+                string posterPath = allPosterForManga.Last().filePath;
+                var allPostersPath = allPosterForManga.Select(p => p.filePath).ToList();
+                
+                return allPostersPath;
+            }
+            return StatusCode(400, "The manga has not posters or has not posters");
+        }
+
+        /// <summary>
+        /// Gets last upload poster to the current manga
+        /// </summary>
+        /// <param name="mangaID">Manga ID in URL</param>
+        /// <returns></returns>
+        /// <remarks>
+        /// Sample request:
+        ///
+        ///     Get /GetLast/1
+        ///     {
+        ///     }
+        ///
+        /// </remarks>
+        /// <response code="200">String path to poster</response>
+        /// <response code="400">If a manga is not found or has not posters</response>
+        [Route("GetLast/{mangaID}")]
+        [HttpGet]
+        public async Task<ActionResult<string>> GetOnce(int mangaID)
+        {
+            var allPosterForManga = await _mangaContext.Posters.Where(p => p.mangaID == mangaID).ToListAsync();
+
+            if(allPosterForManga.Any())
+            {
+                string posterPath = allPosterForManga.Last().filePath;
+                return posterPath;
+            }
+            return StatusCode(400, "The manga is not found or has not posters");
         }
 
         /// <summary>

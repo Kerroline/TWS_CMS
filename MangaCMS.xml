@@ -165,6 +165,40 @@
              <response code="204">If poster upload</response>
              <response code="400">If poster not sended or manga not found</response>
         </member>
+        <member name="M:MangaCMS.Controllers.V1.PosterController.GetAll(System.Int32)">
+             <summary>
+             Gets last upload poster to the current manga
+             </summary>
+             <param name="mangaID">Manga ID in URL</param>
+             <returns></returns>
+             <remarks>
+             Sample request:
+            
+                 Get /GetAll/1
+                 {
+                 }
+            
+             </remarks>
+             <response code="200">List of String path to poster</response>
+             <response code="400">If a manga is not found or has not posters</response>
+        </member>
+        <member name="M:MangaCMS.Controllers.V1.PosterController.GetOnce(System.Int32)">
+             <summary>
+             Gets last upload poster to the current manga
+             </summary>
+             <param name="mangaID">Manga ID in URL</param>
+             <returns></returns>
+             <remarks>
+             Sample request:
+            
+                 Get /GetLast/1
+                 {
+                 }
+            
+             </remarks>
+             <response code="200">String path to poster</response>
+             <response code="400">If a manga is not found or has not posters</response>
+        </member>
         <member name="M:MangaCMS.Controllers.V1.PosterController.UploadPosterToManga(System.Int32,Microsoft.AspNetCore.Http.IFormFile)">
              <summary>
              Upload Poster to Manga.
