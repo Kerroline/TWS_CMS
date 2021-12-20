@@ -37,7 +37,6 @@ namespace MangaCMS.Controllers.V1
         ///
         /// </remarks>
         /// <response code="200">List of Genres</response>
-        [Route("GetAll")]
         [HttpGet]
         public async Task<ActionResult<IEnumerable<GenreModel>>> GetAll()
         {
@@ -58,7 +57,6 @@ namespace MangaCMS.Controllers.V1
         /// </remarks>
         /// <response code="200">Genre by id</response>
         /// <response code="400">Genre is not found</response>
-        [Route("GetOnce")]
         [HttpGet("{id}")]
         public async Task<ActionResult<GenreModel>> GetOnce(int id)
         {
@@ -127,7 +125,6 @@ namespace MangaCMS.Controllers.V1
         /// </remarks>
         /// <response code="204">If the genre is update</response>
         /// <response code="400">If the genre is not found or model invalid</response>
-        [Route("Edit")]
         [HttpPut("{id}")]
         public async Task<ActionResult<GenreModel>> Edit(int id, GenreModel genre)
         {
@@ -159,7 +156,6 @@ namespace MangaCMS.Controllers.V1
         /// </remarks>
         /// <response code="204">If the status is deleted</response>
         /// <response code="400">If the status is not found</response>
-        [Route("Delete")]
         [HttpDelete("{id}")]
         public async Task<ActionResult<GenreModel>> Delete(int id)
         {
