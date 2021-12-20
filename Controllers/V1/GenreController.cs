@@ -126,7 +126,7 @@ namespace MangaCMS.Controllers.V1
         ///
         /// </remarks>
         /// <response code="204">If the genre is update</response>
-        /// <response code="400">If the genre is not found</response>
+        /// <response code="400">If the genre is not found or model invalid</response>
         [Route("Edit")]
         [HttpPut("{id}")]
         public async Task<ActionResult<GenreModel>> Edit(int id, GenreModel genre)
