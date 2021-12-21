@@ -167,7 +167,7 @@
         </member>
         <member name="M:MangaCMS.Controllers.V1.PosterController.GetAll(System.Int32)">
              <summary>
-             Gets last upload poster to the current manga
+             Get all upload poster to the current manga
              </summary>
              <param name="mangaID">Manga ID in URL</param>
              <returns></returns>
@@ -182,9 +182,26 @@
              <response code="200">List of String path to poster</response>
              <response code="400">If a manga is not found or has not posters</response>
         </member>
+        <member name="M:MangaCMS.Controllers.V1.PosterController.GetByID(System.Int32)">
+             <summary>
+             Get a poster by ID
+             </summary>
+             <param name="posterID">Poster ID in URL</param>
+             <returns></returns>
+             <remarks>
+             Sample request:
+            
+                 Get /GetByID/1
+                 {
+                 }
+            
+             </remarks>
+             <response code="200">List of String path to poster</response>
+             <response code="400">If a manga is not found or has not posters</response>
+        </member>
         <member name="M:MangaCMS.Controllers.V1.PosterController.GetOnce(System.Int32)">
              <summary>
-             Gets last upload poster to the current manga
+             Get last upload poster to the current manga
              </summary>
              <param name="mangaID">Manga ID in URL</param>
              <returns></returns>
@@ -201,23 +218,61 @@
         </member>
         <member name="M:MangaCMS.Controllers.V1.PosterController.UploadPosterToManga(System.Int32,Microsoft.AspNetCore.Http.IFormFile)">
              <summary>
-             Upload Poster to Manga.
+             Upload a poster to manga.
              </summary>
              <param name="mangaID">Manga ID in URL</param>
-             <param name="image">Poster ID </param>
+             <param name="image">Poster image</param>
              <returns></returns>
              <remarks>
              Sample request:
             
-                 POST /Upload
+                 POST /Create
                  {
                     "mangaID": 1
                     "image": file.png
                  }
             
              </remarks>
-             <response code="204">If poster upload</response>
+             <response code="201">If a poster is upload</response>
              <response code="400">If poster not sended or manga not found</response>
+        </member>
+        <member name="M:MangaCMS.Controllers.V1.PosterController.EditByID(System.Int32,Microsoft.AspNetCore.Http.IFormFile,System.Nullable{System.Int32})">
+             <summary>
+             Upload Poster to Manga.
+             </summary>
+             <param name="posterID">Poster ID in URL</param>
+             <param name="image">Poster image</param>
+             /// <param name="mangaID">Poster image</param>
+             <returns></returns>
+             <remarks>
+             Sample request:
+            
+                 PUT /EditByID/1
+                 {
+                    "image": file.png
+                    "mangaID": 1
+                 }
+            
+             </remarks>
+             <response code="201">If a poster is upload</response>
+             <response code="400">If poster not sended or manga not found</response>
+        </member>
+        <member name="M:MangaCMS.Controllers.V1.PosterController.Delete(System.Int32)">
+             <summary>
+             Delete an exist poster
+             </summary>
+             <param name="id"></param>
+             <returns></returns>
+             <remarks>
+             Sample request:
+            
+                 DELETE /Delete/1
+                 {
+                 }
+            
+             </remarks>
+             <response code="204">If the poster was deleted</response>
+             <response code="400">If the poster is not found</response>
         </member>
         <member name="M:MangaCMS.Controllers.V1.StatusController.GetAll">
              <summary>

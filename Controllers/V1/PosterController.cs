@@ -27,7 +27,7 @@ namespace MangaCMS.Controllers.V1
         }
 
         /// <summary>
-        /// Gets last upload poster to the current manga
+        /// Get all upload poster to the current manga
         /// </summary>
         /// <param name="mangaID">Manga ID in URL</param>
         /// <returns></returns>
@@ -58,7 +58,35 @@ namespace MangaCMS.Controllers.V1
         }
 
         /// <summary>
-        /// Gets last upload poster to the current manga
+        /// Get a poster by ID
+        /// </summary>
+        /// <param name="posterID">Poster ID in URL</param>
+        /// <returns></returns>
+        /// <remarks>
+        /// Sample request:
+        ///
+        ///     Get /GetByID/1
+        ///     {
+        ///     }
+        ///
+        /// </remarks>
+        /// <response code="200">List of String path to poster</response>
+        /// <response code="400">If a manga is not found or has not posters</response>
+        [Route("GetByID/{posterID}")]
+        [HttpGet]
+        public async Task<ActionResult<string>> GetByID(int posterID)
+        {
+            var currentPoster = await _mangaContext.Posters.FindAsync(posterID);
+
+            if (currentPoster is not null)
+            {
+                return currentPoster.filePath;
+            }
+            return StatusCode(400, "The manga has not posters or has not posters");
+        }
+
+        /// <summary>
+        /// Get last upload poster to the current manga
         /// </summary>
         /// <param name="mangaID">Manga ID in URL</param>
         /// <returns></returns>
@@ -87,31 +115,31 @@ namespace MangaCMS.Controllers.V1
         }
 
         /// <summary>
-        /// Upload Poster to Manga.
+        /// Upload a poster to manga.
         /// </summary>
         /// <param name="mangaID">Manga ID in URL</param>
-        /// <param name="image">Poster ID </param>
+        /// <param name="image">Poster image</param>
         /// <returns></returns>
         /// <remarks>
         /// Sample request:
         ///
-        ///     POST /Upload
+        ///     POST /Create
         ///     {
         ///        "mangaID": 1
         ///        "image": file.png
         ///     }
         ///
         /// </remarks>
-        /// <response code="204">If poster upload</response>
+        /// <response code="201">If a poster is upload</response>
         /// <response code="400">If poster not sended or manga not found</response>
         [Route("Create")]
         [Authorize(Roles = "Admin")]
         [HttpPost]
-        public ActionResult<IFormFile> UploadPosterToManga([FromForm]int mangaID, IFormFile image)
+        public async Task<ActionResult<IFormFile>> UploadPosterToManga([FromForm]int mangaID, IFormFile image)
         {
             if (image != null)
             {
-                var current_manga = _mangaContext.Mangas.Find(mangaID);
+                var current_manga = await _mangaContext.Mangas.FindAsync(mangaID);
                 if (current_manga is not null)
                 {
                     string mangaNameWithoutSpaces = current_manga.englishName.Replace(" ", "").ToLower();
@@ -127,9 +155,9 @@ namespace MangaCMS.Controllers.V1
 
                     current_manga.listOfPosters.Add(poster);
                     _mangaContext.Add(poster);
-                    _mangaContext.SaveChanges();
+                    await _mangaContext.SaveChangesAsync();
 
-                    return StatusCode(204);
+                    return StatusCode(201, "The poster is loaded successfully");
 
                 }
                 return StatusCode(400, "The Manga not exist");
@@ -137,5 +165,72 @@ namespace MangaCMS.Controllers.V1
             return StatusCode(400, "Image not sended");
         }
 
+        /// <summary>
+        /// Change manga for this poster
+        /// </summary>
+        /// <param name="posterID">Poster ID in URL</param>
+        /// /// <param name="mangaID">Poster image</param>
+        /// <returns></returns>
+        /// <remarks>
+        /// Sample request:
+        ///
+        ///     PUT /EditByID/1
+        ///     {
+        ///        "mangaID": 1
+        ///     }
+        ///
+        /// </remarks>
+        /// <response code="201">If a manga was changed</response>
+        /// <response code="400">If poster is not found or manga is not found</response>
+        [Route("EditByID/{posterID}")]
+        [Authorize(Roles = "Admin")]
+        [HttpPut]
+        public async Task<ActionResult<IFormFile>> EditByID(int posterID, int mangaID)
+        {
+            var currentPoster = await _mangaContext.Posters.FindAsync(posterID);
+            if(currentPoster is not null)
+            {
+                var newManga = await _mangaContext.Mangas.FindAsync(mangaID);
+                if(newManga is not null)
+                {
+
+                    currentPoster.mangaID = mangaID;
+                    await _mangaContext.SaveChangesAsync();
+
+                    return StatusCode(201, "A manga of this poster was changed successfully");
+                }
+                return StatusCode(400, "A manga is not found");
+            }
+            return StatusCode(400, "A poster is not found");
+        }
+
+        /// <summary>
+        /// Delete an exist poster
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        /// <remarks>
+        /// Sample request:
+        ///
+        ///     DELETE /Delete/1
+        ///     {
+        ///     }
+        ///
+        /// </remarks>
+        /// <response code="204">If the poster was deleted</response>
+        /// <response code="400">If the poster is not found</response>
+        [Route("Delete/{id}")]
+        [HttpDelete]
+        public async Task<ActionResult<PosterModel>> Delete(int id)
+        {
+            var currentPoster = await _mangaContext.Posters.FindAsync(id);
+            if (currentPoster is not null)
+            {
+                _mangaContext.Posters.Remove(currentPoster);
+                await _mangaContext.SaveChangesAsync();
+                return StatusCode(204, "A Poster was deleted successfully");
+            }
+            return StatusCode(400, "A Poster is not found");
+        }
     }
 }
