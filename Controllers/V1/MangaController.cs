@@ -28,24 +28,59 @@ namespace MangaCMS.Controllers.V1
             _env = env;
         }
 
-
+        /// <summary>
+        /// Get all mangas
+        /// </summary>
+        /// <returns>All mangas in database</returns>
+        /// <remarks>
+        /// Sample request:
+        ///
+        ///     GET /GetAll
+        ///     {
+        ///     }
+        ///
+        /// </remarks>
+        /// <response code="200">List of Mangas</response>
+        [Route("GetAll")]
         [HttpGet]
         public async Task<ActionResult<IEnumerable<MangaModel>>> GetAll()
         {
-            var mangas = _mangaContext.Mangas.Include(m => m.status);
-            return await mangas.ToListAsync();
+            return await _mangaContext.Mangas.Include(m => m.status)
+                                             .Include(m => m.listOfGenres)
+                                             .Include(m => m.listOfPosters)
+                                             .ToListAsync();
         }
-        [Route("GetJSON")]
+
+        /// <summary>
+        /// Get once manga.
+        /// </summary>
+        /// <returns></returns>
+        /// <remarks>
+        /// Sample request:
+        ///
+        ///     GET /Get/1
+        ///     {
+        ///     }
+        ///
+        /// </remarks>
+        /// <response code="200">A manga by id</response>
+        /// <response code="400">If a manga is not found</response>
+        [Route("Get/{id}")]
         [HttpGet]
-        public ActionResult GetJson()
+        public async Task<ActionResult<MangaModel>> GetByID(int mangaID)
         {
-            var mangas = _mangaContext.Mangas.Include(m => m.status);
+            var allMangas = await _mangaContext.Mangas.Include(m => m.status)
+                                             .Include(m => m.listOfGenres)
+                                             .Include(m => m.listOfPosters)
+                                             .ToListAsync();
 
-            var mangass = mangas.ToList();
+            var currentManga = allMangas.Find(m => m.ID == mangaID);
 
-            //string json = JsonSerializer.Serialize(mangas);
-
-            return Ok(mangass);
+            if (currentManga is not null)
+            {
+                return StatusCode(200,currentManga);
+            }
+            return StatusCode(400, "The manga is not found");
         }
         /// <summary>
         /// Creates a new Project.
@@ -57,8 +92,15 @@ namespace MangaCMS.Controllers.V1
         ///
         ///     POST /Create
         ///     {
-        ///        ...
-        ///     }
+        ///         "japanName": "Kore wa hon",
+        ///         "russianName": "Это книга",
+        ///         "englishName": "This is book",
+        ///         "link": "http.readmanga.",
+        ///         "year": 2000,
+        ///         "author": "Watakushi",
+        ///         "description": "This story ... ",
+        ///         "statusID": 1,
+        ///     }        
         ///
         /// </remarks>
         /// <response code="201">Returns the newly created item ID</response>
@@ -81,19 +123,10 @@ namespace MangaCMS.Controllers.V1
                     {
                         Manga.statusID = 1;
                     }
+
                     _mangaContext.Mangas.Add(Manga);
                     await _mangaContext.SaveChangesAsync();
-                    List<MangaModel> manga_list = await _mangaContext.Mangas.ToListAsync();
-                    var created_manga = manga_list.Last();
-
-                    if (created_manga.englishName == Manga.englishName)
-                    {
-                        return StatusCode(201, created_manga.ID);
-                    }
-                    else
-                    {
-                        return StatusCode(500, "Manga fail to created");
-                    }
+                    return StatusCode(201, Manga.ID);
                 }
                 else
                 {
@@ -102,6 +135,92 @@ namespace MangaCMS.Controllers.V1
             }
             return StatusCode(400, "Invalid model");    
         }
+
+
+        /// <summary>
+        /// Edit a exist status
+        /// </summary>
+        /// <param name="mangaID">Manga ID in URL</param>
+        /// <param name="newManga">Manga with new field value</param>
+        /// <returns></returns>
+        /// <remarks>
+        /// Sample request:
+        ///
+        ///     PUT /Edit/1
+        ///     {
+        ///         "japanName": "Kore wa hon",
+        ///         "russianName": "Это книга",
+        ///         "englishName": "This is book",
+        ///         "link": "http.readmanga.",
+        ///         "year": 2000,
+        ///         "author": "Watakushi",
+        ///         "description": "This story ... ",
+        ///         "statusID": 1,
+        ///     }
+        ///
+        /// </remarks>
+        /// <response code="200">If the manga was updated</response>
+        /// <response code="400">If a manga is not found or model invalid</response>
+        [Authorize("Admin")]
+        [Route("Edit/{id}")]
+        [HttpPut]
+        public async Task<ActionResult<StatusModel>> Edit(int mangaID, MangaModel newManga)
+        {
+            var oldManga = await _mangaContext.Mangas.FindAsync(mangaID);
+            if (oldManga is not null)
+            {
+                if (ModelState.IsValid)
+                {
+                    oldManga.japanName = newManga.japanName;
+                    oldManga.russianName = newManga.russianName;
+                    oldManga.englishName = newManga.englishName;
+                    oldManga.link = newManga.link;
+                    oldManga.author = newManga.author;
+                    oldManga.description = newManga.description;
+                    oldManga.statusID = newManga.statusID;
+
+                    await _mangaContext.SaveChangesAsync();
+                    return StatusCode(200, "A Manga was updated");
+                }
+            }
+            return StatusCode(400, "A manga is not found or model invalid");
+        }
+
+
+        /// <summary>
+        /// Delete an exist manga
+        /// </summary>
+        /// <param name="mangaID">MangaID in URL</param>
+        /// <returns></returns>
+        /// <remarks>
+        /// Sample request:
+        ///
+        ///     Delete /Delete/1
+        ///     {
+        ///     }
+        ///
+        /// </remarks>
+        /// <response code="204">If the manga was deleted</response>
+        /// <response code="400">If the manga is not found</response>
+        [Authorize("Admin")]
+        [Route("Delete/{id}")]
+        [HttpDelete]
+        public async Task<ActionResult<MangaModel>> Delete(int mangaID)
+        {
+            var currentManga = await _mangaContext.Mangas.FindAsync(mangaID);
+            if (currentManga is not null)
+            {
+                _mangaContext.Mangas.Remove(currentManga);
+                await _mangaContext.SaveChangesAsync();
+                return StatusCode(200, "A manga was deleted successfully ");
+            }
+            return StatusCode(400, "A manga has not found");
+        }
+
+
+
+
+
         //if (Manga.EngName != null)
         //{
         //    foreach (var mang in _db.Mangas)

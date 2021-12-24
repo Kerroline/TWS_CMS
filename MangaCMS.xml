@@ -127,6 +127,37 @@
              <response code="204">If the status is deleted</response>
              <response code="400">If the status is not found</response>
         </member>
+        <member name="M:MangaCMS.Controllers.V1.MangaController.GetAll">
+             <summary>
+             Get all mangas
+             </summary>
+             <returns>All mangas in database</returns>
+             <remarks>
+             Sample request:
+            
+                 GET /GetAll
+                 {
+                 }
+            
+             </remarks>
+             <response code="200">List of Mangas</response>
+        </member>
+        <member name="M:MangaCMS.Controllers.V1.MangaController.GetByID(System.Int32)">
+             <summary>
+             Get once manga.
+             </summary>
+             <returns></returns>
+             <remarks>
+             Sample request:
+            
+                 GET /Get/1
+                 {
+                 }
+            
+             </remarks>
+             <response code="200">A manga by id</response>
+             <response code="400">If a manga is not found</response>
+        </member>
         <member name="M:MangaCMS.Controllers.V1.MangaController.CreateMangaWithoutPoster(MangaCMS.Models.MangaModel)">
              <summary>
              Creates a new Project.
@@ -138,8 +169,15 @@
             
                  POST /Create
                  {
-                    ...
-                 }
+                     "japanName": "Kore wa hon",
+                     "russianName": "Это книга",
+                     "englishName": "This bool",
+                     "link": "http.readmanga.",
+                     "year": 2000,
+                     "author": "Watakushi",
+                     "description": "This story ... ",
+                     "statusID": 1,
+                 }        
             
              </remarks>
              <response code="201">Returns the newly created item ID</response>
@@ -236,12 +274,11 @@
              <response code="201">If a poster is upload</response>
              <response code="400">If poster not sended or manga not found</response>
         </member>
-        <member name="M:MangaCMS.Controllers.V1.PosterController.EditByID(System.Int32,Microsoft.AspNetCore.Http.IFormFile,System.Nullable{System.Int32})">
+        <member name="M:MangaCMS.Controllers.V1.PosterController.EditByID(System.Int32,System.Int32)">
              <summary>
-             Upload Poster to Manga.
+             Change manga for this poster
              </summary>
              <param name="posterID">Poster ID in URL</param>
-             <param name="image">Poster image</param>
              /// <param name="mangaID">Poster image</param>
              <returns></returns>
              <remarks>
@@ -249,13 +286,12 @@
             
                  PUT /EditByID/1
                  {
-                    "image": file.png
                     "mangaID": 1
                  }
             
              </remarks>
-             <response code="201">If a poster is upload</response>
-             <response code="400">If poster not sended or manga not found</response>
+             <response code="201">If a manga was changed</response>
+             <response code="400">If poster is not found or manga is not found</response>
         </member>
         <member name="M:MangaCMS.Controllers.V1.PosterController.Delete(System.Int32)">
              <summary>
