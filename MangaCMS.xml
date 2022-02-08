@@ -42,6 +42,42 @@
              <response code="204">If successful created </response>
              <response code="400">If the model invalid or manga not found</response>
         </member>
+        <member name="M:MangaCMS.Controllers.V1.ChapterController.Edit(System.Int32,MangaCMS.Models.StatusModel)">
+             <summary>
+             Edit a exist chapter
+             </summary>
+             <param name="Status"></param>
+             <returns></returns>
+             <remarks>
+             Sample request:
+            
+                 PUT /Edit/1
+                 {
+                    "StatusName": "newName"
+                 }
+            
+             </remarks>
+             <response code="204">If the status is created</response>
+             <response code="400">If the status is exist or model invalid</response>
+        </member>
+        <member name="M:MangaCMS.Controllers.V1.ChapterController.Delete(System.Int32)">
+             <summary>
+             Delete a exist status
+             </summary>
+             <param name="Status"></param>
+             <returns></returns>
+             <remarks>
+             Sample request:
+            
+                 PUT /Edit/1
+                 {
+                    "StatusName": "newName"
+                 }
+            
+             </remarks>
+             <response code="204">If the status is created</response>
+             <response code="400">If the status is exist or model invalid</response>
+        </member>
         <member name="M:MangaCMS.Controllers.V1.GenreController.GetAll">
              <summary>
              Get all genres
@@ -171,7 +207,7 @@
                  {
                      "japanName": "Kore wa hon",
                      "russianName": "Это книга",
-                     "englishName": "This bool",
+                     "englishName": "This is book",
                      "link": "http.readmanga.",
                      "year": 2000,
                      "author": "Watakushi",
@@ -182,6 +218,49 @@
              </remarks>
              <response code="201">Returns the newly created item ID</response>
              <response code="400">If the project is exist</response>
+        </member>
+        <member name="M:MangaCMS.Controllers.V1.MangaController.Edit(System.Int32,MangaCMS.Models.MangaModel)">
+             <summary>
+             Edit a exist status
+             </summary>
+             <param name="mangaID">Manga ID in URL</param>
+             <param name="newManga">Manga with new field value</param>
+             <returns></returns>
+             <remarks>
+             Sample request:
+            
+                 PUT /Edit/1
+                 {
+                     "japanName": "Kore wa hon",
+                     "russianName": "Это книга",
+                     "englishName": "This is book",
+                     "link": "http.readmanga.",
+                     "year": 2000,
+                     "author": "Watakushi",
+                     "description": "This story ... ",
+                     "statusID": 1,
+                 }
+            
+             </remarks>
+             <response code="200">If the manga was updated</response>
+             <response code="400">If a manga is not found or model invalid</response>
+        </member>
+        <member name="M:MangaCMS.Controllers.V1.MangaController.Delete(System.Int32)">
+             <summary>
+             Delete an exist manga
+             </summary>
+             <param name="mangaID">MangaID in URL</param>
+             <returns></returns>
+             <remarks>
+             Sample request:
+            
+                 Delete /Delete/1
+                 {
+                 }
+            
+             </remarks>
+             <response code="204">If the manga was deleted</response>
+             <response code="400">If the manga is not found</response>
         </member>
         <member name="M:MangaCMS.Controllers.V1.PagesController.CreatePages(System.Int32,Microsoft.AspNetCore.Http.IFormFileCollection)">
              <summary>

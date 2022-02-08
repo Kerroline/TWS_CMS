@@ -152,7 +152,7 @@ namespace MangaCMS
 
         }
 
-        private async Task CreateRoles(RoleManager<IdentityRole> RoleManager, UserManager<CustomUser> UserManager)
+            private async Task CreateRoles(RoleManager<IdentityRole> RoleManager, UserManager<CustomUser> UserManager)
         {
 
             //var RoleManager = serviceProvider.GetRequiredService<RoleManager<IdentityRole>>();
@@ -236,7 +236,9 @@ namespace MangaCMS
             //var serviceProvider = app.ApplicationServices.GetService<IServiceProvider>();
             //var RoleManager = serviceProvider.GetRequiredService<RoleManager<IdentityRole>>();
             //var UserManager = serviceProvider.GetRequiredService<UserManager<CustomUser>>();
+
             mangaCMSContext.Database.Migrate();
+
             CreateRoles(RoleManager, UserManager).Wait();
 
             app.UseEndpoints(endpoints =>
